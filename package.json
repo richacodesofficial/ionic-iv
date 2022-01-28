@@ -9,6 +9,7 @@
     "@capacitor/ios": "^3.4.0",
     "@capacitor/keyboard": "1.2.1",
     "@capacitor/status-bar": "1.0.7",
+    "@capacitor/storage": "^1.2.4",
     "@ionic-enterprise/identity-vault": "^5.4.0",
     "@ionic/react": "^6.0.0",
     "@ionic/react-router": "^6.0.0",

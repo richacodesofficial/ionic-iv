@@ -1,41 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet } from '@ionic/react';
+import { IonApp, IonHeader, IonPage, IonRouterOutlet, IonToolbar } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 
-/* Core CSS required for Ionic components to work properly */
-import '@ionic/react/css/core.css';
+import useLogin from './hooks/useLogin';
+import './App.css';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
-/* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
 
-/* Optional CSS utils that can be commented out */
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/float-elements.css';
-import '@ionic/react/css/text-alignment.css';
-import '@ionic/react/css/text-transformation.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
+const App: React.FC = () => {
+    const [isRegistered] = useLogin();
+    const [isOnboarded, setInOnboarded] = useState(false);
 
-/* Theme variables */
-import './theme/variables.css';
+    console.log(isRegistered, isOnboarded);
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+    return (
+        <IonApp className="app-container">
+            <IonPage>
+                <IonHeader>
+                    <IonToolbar />
+                </IonHeader>
+                <IonReactRouter>
+                    <IonRouterOutlet>
+                        <Route exact path="/home"
+                            render={() => isRegistered && isOnboarded ?
+                                (<Home />) : (<Redirect to="/" />)}
+                        />
+                        <Route exact path="/login" render={() => <Login handleOnLogin={setInOnboarded} />} />
+                        <Route exact path="/register" render={() => isRegistered && !isOnboarded ? (
+                            <Redirect to="/login" />
+                        ) : (<Register />
+                        )} />
+                        <Redirect exact from="/" to="/register" />
+                    </IonRouterOutlet>
+                </IonReactRouter>
+            </IonPage>
+        </IonApp>
+    );
+};
 
 export default App;
