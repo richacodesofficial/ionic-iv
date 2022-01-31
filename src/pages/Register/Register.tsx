@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { IonButton, IonCol, IonContent, IonInput, IonLabel, IonRow } from '@ionic/react';
+import { useEffect } from 'react';
+import { IonButton, IonContent, IonItem, IonLabel } from '@ionic/react';
 import './Register.css';
 import useBioVault from '../../hooks/useBioVault';
 import useCustomVault from '../../hooks/useCustomVault';
 import { useHistory } from 'react-router';
-import useLogin from '../../hooks/useLogin';
 
-const Register: React.FC = () => {
+const Register = (): JSX.Element => {
     const history = useHistory();
-    const [, setRegistered] = useLogin();
-    const [password, setPassword] = useState('');
-    const { unlockBioVault, bioVaultIsLocked, bioVaultError } = useBioVault();
     const { unlockCustomVault, customVaultIsLocked, customVaultError, setCustomPasscode } = useCustomVault();
+    const { unlockBioVault, bioVaultIsLocked, bioVaultError } = useBioVault();
 
-    const handlePasswordOnChange = (event: any) => {
-        const { value } = event.currentTarget;
-        setPassword(value);
-    };
-
-    const handlePassowrdSubmit = () => {
-        setCustomPasscode({
-            data: password, callback: async () => {
-                await setRegistered();
-                history.push('/home');
-            }
-        });
-    };
     useEffect(() => {
         (async () => {
             if (bioVaultIsLocked) {
@@ -39,19 +23,31 @@ const Register: React.FC = () => {
         })();
     }, [bioVaultIsLocked]);
 
-
     useEffect(() => {
         (async () => {
             if (customVaultIsLocked) {
                 // vault is locked
-                console.log('Custom Vault is locked Register.tsx --->');
+                console.log('custom Vault is locked Register.tsx --->');
                 await unlockCustomVault();
             } else {
                 // vault is unlocked
-                console.log('Custom Vault is unlocked Register.tsx --->');
+                console.log('custom Vault is unlocked Register.tsx --->');
+                // history.push('/home');
             }
         })();
     }, [customVaultIsLocked]);
+
+    const handleUnlockCustomVault = async () => {
+        setCustomPasscode(async () => {
+            history.push('/home');
+        });
+    };
+
+    useEffect(() => {
+        if (customVaultError) {
+            console.log('CustomVaultError errror ----->', customVaultError);
+        }
+    }, [customVaultError]);
 
     useEffect(() => {
         if (bioVaultError) {
@@ -59,11 +55,6 @@ const Register: React.FC = () => {
         }
     }, [bioVaultError]);
 
-    useEffect(() => {
-        if (customVaultError) {
-            console.log('CustomVaultError errror ----->', customVaultError);
-        }
-    }, [customVaultError]);
 
     useEffect(() => {
         unlockBioVault();
@@ -73,32 +64,17 @@ const Register: React.FC = () => {
         <IonContent>
             <div className="register-page-wrapper">
                 <div className="register-page-card">
-                    <IonRow>
-                        <IonCol>
-                            <IonLabel className="register-password-label">Set password</IonLabel>
-                        </IonCol>
-                    </IonRow>
-                    <IonRow>
-                        <IonCol>
-                            <IonInput
-                                className="register-password-input"
-                                type="password"
-                                autofocus={true}
-                                value={password}
-                                onChange={handlePasswordOnChange}
-                            />
-                        </IonCol>
-                    </IonRow>
-                    <IonRow>
-                        <IonCol>
-                            {customVaultError || bioVaultError}
-                        </IonCol>
-                    </IonRow>
-                    <IonRow>
-                        <IonCol>
-                            <IonButton onClick={handlePassowrdSubmit}>Submit</IonButton>
-                        </IonCol>
-                    </IonRow>
+                    <IonItem >
+                        <IonButton onClick={handleUnlockCustomVault}>Unlock Vault</IonButton>
+                    </IonItem>
+                    <IonItem>
+                        <IonLabel>Bio vault Error</IonLabel>
+                        {JSON.stringify(bioVaultError)};
+                    </IonItem>
+                    <IonItem>
+                        <IonLabel>Custom vault Error</IonLabel>
+                        {JSON.stringify(customVaultError)};
+                    </IonItem>
                 </div>
             </div>
         </IonContent>
